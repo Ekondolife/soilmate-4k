@@ -1,30 +1,10 @@
-# Remix of Plant matching app
+# 🌱 SoilMate
 
-*Automatically synced with your [v0.app](https://v0.app) deployments*
+SoilMate is a web app that asks users a series of lifestyle and environment-based questions, then recommends the best plants to match their needs. It helps make plant ownership simple, enjoyable, and sustainable.
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/lloydthegods-projects/v0-remix-of-plant-matching-app)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.app-black?style=for-the-badge)](https://v0.app/chat/projects/u2vclPhGmVR)
+## Features
+- Interactive questionnaire for plant matching
+- Smart plant recommendation system
+- Plant care details and profiles
+- Beginner-friendly, sustainable plant ownership
 
-## Overview
-
-This repository will stay in sync with your deployed chats on [v0.app](https://v0.app).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.app](https://v0.app).
-
-## Deployment
-
-Your project is live at:
-
-**[https://vercel.com/lloydthegods-projects/v0-remix-of-plant-matching-app](https://vercel.com/lloydthegods-projects/v0-remix-of-plant-matching-app)**
-
-## Build your app
-
-Continue building your app on:
-
-**[https://v0.app/chat/projects/u2vclPhGmVR](https://v0.app/chat/projects/u2vclPhGmVR)**
-
-## How It Works
-
-1. Create and modify your project using [v0.app](https://v0.app)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
