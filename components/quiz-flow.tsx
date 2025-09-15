@@ -173,25 +173,27 @@ export function QuizFlow({ onBack }: QuizFlowProps) {
               {currentQuestionData.question}
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {currentQuestionData.answers.map((answer) => (
-              <Card
-                key={answer.id}
-                className={`cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg ${
-                  selectedAnswer === answer.id
-                    ? "bg-primary text-primary-foreground border-primary shadow-lg scale-105"
-                    : "bg-card hover:bg-muted/50 border-border"
-                }`}
-                onClick={() => handleAnswerSelect(answer.id)}
-              >
-                <CardContent className="flex items-center justify-center p-6 text-center">
-                  <div className="space-y-2">
-                    <div className="text-4xl">{answer.emoji}</div>
-                    <div className="text-lg font-medium">{answer.text}</div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {currentQuestionData.answers.map((answer) => (
+                <Card
+                  key={answer.id}
+                  className={`cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg ${
+                    selectedAnswer === answer.id
+                      ? "bg-primary text-primary-foreground border-primary shadow-lg scale-105"
+                      : "bg-card hover:bg-muted/50 border-border"
+                  }`}
+                  onClick={() => handleAnswerSelect(answer.id)}
+                >
+                  <CardContent className="flex items-center justify-center p-6 text-center">
+                    <div className="space-y-2">
+                      <div className="text-4xl">{answer.emoji}</div>
+                      <div className="text-lg font-medium">{answer.text}</div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </CardContent>
         </Card>
 
