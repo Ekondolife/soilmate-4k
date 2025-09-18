@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useMemo, useState } from "react"
+import { loadStoredUTM } from "@/lib/utm"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowLeft, Share2, ShoppingBag, RotateCcw } from "lucide-react"
@@ -130,6 +131,39 @@ export function SoilmateResults({ answers, onRetakeQuiz, onBack }: SoilmateResul
   }
 
   const matchedPlant = getMatchedPlant()
+
+  const utm = useMemo(() => loadStoredUTM(), [])
+
+  useEffect(() => {
+    // Fire GA4 event
+    try {
+      // @ts-ignore
+      window.gtag?.('event', 'soilmate_match', {
+        plant_id: matchedPlant.id,
+        plant_name: matchedPlant.name,
+        care_level: matchedPlant.careLevel,
+        light_needs: matchedPlant.lightNeeds,
+        ...utm,
+      })
+    } catch {}
+
+    // Send to Sheets webhook via API route
+    fetch('/api/match', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        plant_id: matchedPlant.id,
+        plant_name: matchedPlant.name,
+        care_level: matchedPlant.careLevel,
+        light_needs: matchedPlant.lightNeeds,
+        answers,
+        utm,
+        page: typeof window !== 'undefined' ? window.location.href : undefined,
+      }),
+      keepalive: true,
+    }).catch(() => {})
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [matchedPlant.id])
 
   const handleShare = async () => {
     const shareData = {
