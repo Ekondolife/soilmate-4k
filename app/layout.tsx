@@ -41,6 +41,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://v0-remix-of-plant-matching-app.vercel.app",
   },
+    generator: 'v0.app'
 };
 
 export default function RootLayout({
