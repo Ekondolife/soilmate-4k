@@ -12,18 +12,36 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { QuizFlow } from "@/components/quiz-flow"
+import { UserDataForm } from "@/components/user-data-form" // Added user data form import
 import Image from "next/image"
 
 export default function HomePage() {
   const [isHowItWorksOpen, setIsHowItWorksOpen] = useState(false)
   const [showQuiz, setShowQuiz] = useState(false)
+  const [showUserForm, setShowUserForm] = useState(false) // Added state for user form
+  const [userData, setUserData] = useState<{ name: string; email: string; phone: string } | null>(null) // Added user data state
 
   const startQuiz = () => {
+    setShowUserForm(true)
+  }
+
+  const handleUserDataSubmit = (data: { name: string; email: string; phone: string }) => {
+    setUserData(data)
+    setShowUserForm(false)
     setShowQuiz(true)
   }
 
   const returnToLanding = () => {
     setShowQuiz(false)
+    setShowUserForm(false) // Also reset user form state
+  }
+
+  const returnFromUserForm = () => {
+    setShowUserForm(false) // Return from user form to landing
+  }
+
+  if (showUserForm) {
+    return <UserDataForm onSubmit={handleUserDataSubmit} onBack={returnFromUserForm} />
   }
 
   if (showQuiz) {

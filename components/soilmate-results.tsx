@@ -12,6 +12,7 @@ interface Plant {
   id: string
   name: string
   emoji: string
+  image: string // Added image property for actual plant photos
   personality: string
   careLevel: string
   lightNeeds: string
@@ -23,6 +24,7 @@ const plants: Plant[] = [
     id: "aglaonema",
     name: "Aglaonema",
     emoji: "🌿✨",
+    image: "/beautiful-aglaonema-chinese-evergreen-plant-with-c.jpg",
     personality:
       "Your Soilmate is the perfect companion for busy lifestyles. With stunning variegated leaves, it teaches you that beauty comes in many forms. It thrives in low light and forgives forgotten waterings, reminding you that resilience is a quiet strength.",
     careLevel: "minimal",
@@ -33,6 +35,7 @@ const plants: Plant[] = [
     id: "syngonium",
     name: "Syngonium",
     emoji: "🌱💚",
+    image: "/syngonium-arrowhead-plant-with-heart-shaped-green-.jpg",
     personality:
       "Your Soilmate grows and changes with you, starting with simple heart-shaped leaves that transform into intricate patterns. It teaches you that growth is a journey, not a destination, and that adapting to change brings new beauty.",
     careLevel: "little",
@@ -43,6 +46,7 @@ const plants: Plant[] = [
     id: "spider-plant",
     name: "Spider Plant",
     emoji: "🕷️🌿",
+    image: "/spider-plant-with-long-green-striped-leaves-and-ba.jpg",
     personality:
       "Your Soilmate is generous and giving, producing baby plants that you can share with others. It teaches you that abundance comes from nurturing relationships and that the best gifts are the ones that keep growing.",
     careLevel: "little",
@@ -53,6 +57,7 @@ const plants: Plant[] = [
     id: "baby-rubber-plant",
     name: "Baby Rubber Plant",
     emoji: "🌿🍃",
+    image: "/baby-rubber-plant-with-thick-glossy-green-oval-lea.jpg",
     personality:
       "Your Soilmate has thick, glossy leaves that store water and wisdom. It teaches you patience and the value of steady growth. Like you, it's adaptable and resilient, thriving in various conditions while maintaining its elegant composure.",
     careLevel: "minimal",
@@ -63,6 +68,7 @@ const plants: Plant[] = [
     id: "sansevieria",
     name: "Sansevieria",
     emoji: "🗡️🌱",
+    image: "/sansevieria-snake-plant-with-tall-upright-sword-li.jpg",
     personality:
       "Your Soilmate stands tall and proud with sword-like leaves that purify the air around you. It teaches you about boundaries and self-care, showing that sometimes the strongest thing you can do is simply stand your ground and breathe clean.",
     careLevel: "minimal",
@@ -73,6 +79,7 @@ const plants: Plant[] = [
     id: "snake-plant",
     name: "Snake Plant",
     emoji: "🐍🌿",
+    image: "/snake-plant-with-tall-thick-green-leaves-with-yell.jpg",
     personality:
       "Your Soilmate is the ultimate survivor, thriving on neglect and low maintenance. It teaches you that consistency doesn't require perfection, and that sometimes the most beautiful growth happens when you learn to trust the process and let go.",
     careLevel: "minimal",
@@ -138,7 +145,7 @@ export function SoilmateResults({ answers, onRetakeQuiz, onBack }: SoilmateResul
     // Fire GA4 event
     try {
       // @ts-ignore
-      window.gtag?.('event', 'soilmate_match', {
+      window.gtag?.("event", "soilmate_match", {
         plant_id: matchedPlant.id,
         plant_name: matchedPlant.name,
         care_level: matchedPlant.careLevel,
@@ -148,9 +155,9 @@ export function SoilmateResults({ answers, onRetakeQuiz, onBack }: SoilmateResul
     } catch {}
 
     // Send to Sheets webhook via API route
-    fetch('/api/match', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    fetch("/api/match", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         plant_id: matchedPlant.id,
         plant_name: matchedPlant.name,
@@ -158,7 +165,7 @@ export function SoilmateResults({ answers, onRetakeQuiz, onBack }: SoilmateResul
         light_needs: matchedPlant.lightNeeds,
         answers,
         utm,
-        page: typeof window !== 'undefined' ? window.location.href : undefined,
+        page: typeof window !== "undefined" ? window.location.href : undefined,
       }),
       keepalive: true,
     }).catch(() => {})
@@ -167,8 +174,8 @@ export function SoilmateResults({ answers, onRetakeQuiz, onBack }: SoilmateResul
 
   const handleShare = async () => {
     const shareData = {
-      title: `My Soilmate is a ${matchedPlant.name}!`,
-      text: `I just found my perfect plant companion! ${matchedPlant.personality.slice(0, 100)}... Find your Soilmate too!`,
+      title: `🌱 Found my Soilmate!`,
+      text: `Just discovered my perfect plant match: ${matchedPlant.name}! 🌿 Find yours too!`,
       url: window.location.origin,
     }
 
@@ -265,7 +272,17 @@ export function SoilmateResults({ answers, onRetakeQuiz, onBack }: SoilmateResul
 
           <Card className="bg-card/90 backdrop-blur-sm border-border/50 shadow-2xl max-w-2xl mx-auto">
             <CardHeader className="text-center pb-6">
-              <div className="text-8xl mb-4 animate-pulse">{matchedPlant.emoji}</div>
+              <div className="mb-4 flex justify-center">
+                <div className="w-32 h-32 rounded-full overflow-hidden shadow-lg">
+                  <Image
+                    src={matchedPlant.image || "/placeholder.svg"}
+                    alt={matchedPlant.name}
+                    width={128}
+                    height={128}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
               <CardTitle className="text-3xl md:text-4xl text-card-foreground mb-2">{matchedPlant.name}</CardTitle>
               <p className="text-muted-foreground text-lg">{matchedPlant.description}</p>
             </CardHeader>

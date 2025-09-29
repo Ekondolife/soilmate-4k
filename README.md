@@ -30,4 +30,4 @@ Continue building your app on:
 4. Vercel deploys the latest version from this repository
 
    test
-   test2.0
+   test2
