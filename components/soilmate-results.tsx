@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { loadStoredUTM } from "@/lib/utm"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -92,9 +92,10 @@ interface SoilmateResultsProps {
   answers: Record<number, string>
   onRetakeQuiz: () => void
   onBack: () => void
+  userData?: { name: string; email: string; phone: string } | null
 }
 
-export function SoilmateResults({ answers, onRetakeQuiz, onBack }: SoilmateResultsProps) {
+export function SoilmateResults({ answers, onRetakeQuiz, onBack, userData }: SoilmateResultsProps) {
   const [shareDialogOpen, setShareDialogOpen] = useState(false)
 
   const getMatchedPlant = (): Plant => {
@@ -103,6 +104,14 @@ export function SoilmateResults({ answers, onRetakeQuiz, onBack }: SoilmateResul
     const careLevel = answers[2] // minimal, little, love-it
     const spaceLight = answers[3] // sunny, shady, mixed
     const reminder = answers[4] // slow-down, gratitude, responsibility
+
+    // Override: poor light or rarely available => Snake Plant/Sansevieria
+    if (spaceLight === "shady" || homeFrequency === "rarely") {
+      const snake = plants.find((p) => p.id === "snake-plant")
+      if (snake) return snake
+      const sansevieria = plants.find((p) => p.id === "sansevieria")
+      if (sansevieria) return sansevieria
+    }
 
     let matchedPlants = plants.filter((plant) => {
       const careMatch = plant.careLevel === careLevel
@@ -141,6 +150,7 @@ export function SoilmateResults({ answers, onRetakeQuiz, onBack }: SoilmateResul
 
   const utm = useMemo(() => loadStoredUTM(), [])
 
+  const hasPostedMatchRef = useRef(false)
   useEffect(() => {
     // Fire GA4 event
     try {
@@ -155,6 +165,8 @@ export function SoilmateResults({ answers, onRetakeQuiz, onBack }: SoilmateResul
     } catch {}
 
     // Send to Sheets webhook via API route
+    if (hasPostedMatchRef.current) return
+    hasPostedMatchRef.current = true
     fetch("/api/match", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -169,6 +181,32 @@ export function SoilmateResults({ answers, onRetakeQuiz, onBack }: SoilmateResul
       }),
       keepalive: true,
     }).catch(() => {})
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [matchedPlant.id])
+
+  // Submit consolidated Google Form at the end with user info + soilmate
+  const hasSubmittedFormRef = useRef(false)
+  useEffect(() => {
+    if (!userData) return
+    if (hasSubmittedFormRef.current) return
+    try {
+      const formDataToSend = new FormData()
+      formDataToSend.append("entry.1992583615", userData.name)
+      formDataToSend.append("entry.1431523734", userData.email)
+      formDataToSend.append("entry.321670577", userData.phone)
+      formDataToSend.append("entry.1278630449", matchedPlant.name)
+
+      hasSubmittedFormRef.current = true
+      fetch(
+        "https://docs.google.com/forms/u/0/d/e/1FAIpQLScRykTySMfWTyGS6QAyF3lHLBzUh7ZBYKLKCTaTo4-Sbgs9eA/formResponse",
+        {
+          method: "POST",
+          body: formDataToSend,
+          mode: "no-cors",
+          keepalive: true,
+        },
+      ).catch(() => {})
+    } catch {}
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [matchedPlant.id])
 

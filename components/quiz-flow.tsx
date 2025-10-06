@@ -70,9 +70,10 @@ const quizQuestions: QuizQuestion[] = [
 
 interface QuizFlowProps {
   onBack: () => void
+  userData?: { name: string; email: string; phone: string } | null
 }
 
-export function QuizFlow({ onBack }: QuizFlowProps) {
+export function QuizFlow({ onBack, userData }: QuizFlowProps) {
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [answers, setAnswers] = useState<Record<number, string>>({})
   const [selectedAnswer, setSelectedAnswer] = useState<string>("")
@@ -114,7 +115,7 @@ export function QuizFlow({ onBack }: QuizFlowProps) {
   }
 
   if (showResults) {
-    return <SoilmateResults answers={answers} onRetakeQuiz={handleRetakeQuiz} onBack={onBack} />
+    return <SoilmateResults answers={answers} userData={userData || null} onRetakeQuiz={handleRetakeQuiz} onBack={onBack} />
   }
 
   const currentQuestionData = quizQuestions[currentQuestion]

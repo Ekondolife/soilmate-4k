@@ -25,26 +25,7 @@ export function UserDataForm({ onSubmit, onBack }: UserDataFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
-
     try {
-      const formDataToSend = new FormData()
-      formDataToSend.append("entry.1992583615", formData.name)
-      formDataToSend.append("entry.1431523734", formData.email)
-      formDataToSend.append("entry.321670577", formData.phone)
-
-      await fetch(
-        "https://docs.google.com/forms/u/0/d/e/1FAIpQLScRykTySMfWTyGS6QAyF3lHLBzUh7ZBYKLKCTaTo4-Sbgs9eA/formResponse",
-        {
-          method: "POST",
-          body: formDataToSend,
-          mode: "no-cors",
-        },
-      )
-
-      onSubmit(formData)
-    } catch (error) {
-      console.error("Error submitting form:", error)
-      // Continue anyway since Google Forms submission might work even if we get an error
       onSubmit(formData)
     } finally {
       setIsSubmitting(false)

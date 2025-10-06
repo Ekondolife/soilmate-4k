@@ -45,7 +45,7 @@ export default function HomePage() {
   }
 
   if (showQuiz) {
-    return <QuizFlow onBack={returnToLanding} />
+    return <QuizFlow onBack={returnToLanding} userData={userData} />
   }
 
   return (
