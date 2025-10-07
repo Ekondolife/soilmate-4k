@@ -167,6 +167,12 @@ export function SoilmateResults({ answers, onRetakeQuiz, onBack, userData }: Soi
     // Send to Sheets webhook via API route
     if (hasPostedMatchRef.current) return
     hasPostedMatchRef.current = true
+    console.log('📊 Sending match data to API:', {
+      plant_id: matchedPlant.id,
+      plant_name: matchedPlant.name,
+      care_level: matchedPlant.careLevel,
+      light_needs: matchedPlant.lightNeeds,
+    })
     fetch("/api/match", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -180,7 +186,14 @@ export function SoilmateResults({ answers, onRetakeQuiz, onBack, userData }: Soi
         page: typeof window !== "undefined" ? window.location.href : undefined,
       }),
       keepalive: true,
-    }).catch(() => {})
+    }).then(response => {
+      console.log('📊 API response:', response.status, response.ok)
+      return response.json()
+    }).then(data => {
+      console.log('📊 API data:', data)
+    }).catch(error => {
+      console.error('📊 API error:', error)
+    })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [matchedPlant.id])
 

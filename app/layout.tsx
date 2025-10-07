@@ -2,6 +2,8 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
+import GA4Tracker from "@/components/ga4-tracker"
+import ClarityTracker from "@/components/clarity-tracker"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -55,7 +57,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`font-sans ${inter.variable} antialiased`}>{children}</body>
+      <body className={`font-sans ${inter.variable} antialiased`}>
+        {children}
+        <GA4Tracker />
+        <ClarityTracker />
+      </body>
     </html>
   )
 }
