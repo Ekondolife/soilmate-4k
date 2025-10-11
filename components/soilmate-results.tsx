@@ -223,6 +223,48 @@ export function SoilmateResults({ answers, onRetakeQuiz, onBack, userData }: Soi
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [matchedPlant.id])
 
+  // Send email with soilmate results
+  const hasSentEmailRef = useRef(false)
+  useEffect(() => {
+    if (!userData) return
+    if (hasSentEmailRef.current) return
+    
+    hasSentEmailRef.current = true
+    console.log('📧 Sending soilmate email to:', userData.email)
+    
+    fetch("/api/send-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: userData.email,
+        plantName: matchedPlant.name,
+        plantImage: matchedPlant.image,
+        plantDescription: matchedPlant.description,
+        plantPersonality: matchedPlant.personality,
+      }),
+    })
+    .then(response => {
+      console.log('📧 Email API response:', response.status, response.ok)
+      return response.json()
+    })
+    .then(data => {
+      console.log('📧 Email API response data:', data)
+      if (data.ok) {
+        if (data.message === 'Email service not configured') {
+          console.log('📧 Email service not configured - no email sent')
+        } else {
+          console.log('📧 Email sent successfully!')
+        }
+      } else {
+        console.error('📧 Email failed:', data.error)
+      }
+    })
+    .catch(error => {
+      console.error('📧 Email error:', error)
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [matchedPlant.id])
+
   const handleShare = async () => {
     const shareData = {
       title: `🌱 Found my Soilmate!`,

@@ -112,7 +112,7 @@ export default function HomePage() {
             className="text-lg px-8 py-6 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
             onClick={startQuiz}
           >
-            Start Quiz 🌿
+            Find Your Soilmate 🌿
           </Button>
 
           <Dialog open={isHowItWorksOpen} onOpenChange={setIsHowItWorksOpen}>
