@@ -5,9 +5,25 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { email, firstName, lastName } = body;
+    let { email, firstName, lastName, phone } = body;
 
-    console.log("BREVO_API_KEY length:", process.env.BREVO_API_KEY?.length)
+    // 🧠 Normalize phone number (E.164 format)
+    if (phone) {
+      phone = phone.trim();
+      if (/^0\d{10}$/.test(phone)) {
+        // 08012345678 → +2348012345678
+        phone = `+234${phone.slice(1)}`;
+      } else if (/^234\d{10}$/.test(phone)) {
+        // 2348012345678 → +2348012345678
+        phone = `+${phone}`;
+      } else if (!phone.startsWith("+")) {
+        // fallback
+        phone = `+${phone}`;
+      }
+    }
+
+    console.log("📩 Adding contact:", { email, firstName, lastName, phone });
+
     if (!process.env.BREVO_API_KEY) {
       console.log("⚠️ BREVO_API_KEY not set");
       return NextResponse.json({ ok: false, error: "BREVO_API_KEY not set" }, { status: 500 });
@@ -24,28 +40,35 @@ export async function POST(request: Request) {
         attributes: {
           FIRSTNAME: firstName,
           LASTNAME: lastName,
+          SMS: phone, // ✅ stored under "SMS" in Brevo
         },
-        updateEnabled: true, // updates if user already exists
-        listIds: [2], // optional: ID of your Brevo contact list
+        updateEnabled: true, // updates existing contacts
+        listIds: [4], // ✅ "your soul mate campaign #4"
       }),
     });
 
-    let data: any = null
+    let data: any = null;
     try {
       data = await res.json();
-    } catch {}
+    } catch (e) {
+      console.warn("⚠️ Could not parse Brevo JSON response");
+    }
+
     console.log("📨 Brevo response:", res.status, data);
 
     if (!res.ok) {
-      const errorMsg = (data && (data.message || data.code || JSON.stringify(data))) || "Brevo error"
+      const errorMsg =
+        (data && (data.message || data.code || JSON.stringify(data))) ||
+        "Unknown Brevo error";
       return NextResponse.json({ ok: false, error: errorMsg }, { status: res.status });
     }
 
     return NextResponse.json({ ok: true, data });
   } catch (error) {
-    console.error("/api/brevo error:", error);
-    return NextResponse.json({ ok: false, error: String(error) || "Server error" }, { status: 500 });
+    console.error("💥 /api/brevo error:", error);
+    return NextResponse.json(
+      { ok: false, error: String(error) || "Server error" },
+      { status: 500 }
+    );
   }
 }
-
-
