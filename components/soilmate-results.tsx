@@ -223,15 +223,14 @@ export function SoilmateResults({ answers, onRetakeQuiz, onBack, userData }: Soi
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [matchedPlant.id])
 
-  // Send email with soilmate results
+  // Send email with soilmate results (one-time)
   const hasSentEmailRef = useRef(false)
   useEffect(() => {
-    if (!userData) return
+    if (!userData || !userData.email) return
     if (hasSentEmailRef.current) return
-    
     hasSentEmailRef.current = true
-    console.log('📧 Sending soilmate email to:', userData.email)
     
+    console.log("📧 Preparing to send soilmate email to:", userData.email)
     fetch("/api/send-email", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -242,26 +241,18 @@ export function SoilmateResults({ answers, onRetakeQuiz, onBack, userData }: Soi
         plantDescription: matchedPlant.description,
         plantPersonality: matchedPlant.personality,
       }),
+      keepalive: true,
     })
-    .then(response => {
-      console.log('📧 Email API response:', response.status, response.ok)
-      return response.json()
-    })
-    .then(data => {
-      console.log('📧 Email API response data:', data)
-      if (data.ok) {
-        if (data.message === 'Email service not configured') {
-          console.log('📧 Email service not configured - no email sent')
-        } else {
-          console.log('📧 Email sent successfully!')
-        }
-      } else {
-        console.error('📧 Email failed:', data.error)
-      }
-    })
-    .catch(error => {
-      console.error('📧 Email error:', error)
-    })
+      .then((res) => {
+        console.log("📧 Email API response:", res.status, res.ok)
+        return res.json().catch(() => ({}))
+      })
+      .then((data) => {
+        console.log("📧 Email API data:", data)
+      })
+      .catch((err) => {
+        console.error("📧 Email API error:", err)
+      })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [matchedPlant.id])
 

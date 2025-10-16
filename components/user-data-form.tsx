@@ -21,11 +21,37 @@ export function UserDataForm({ onSubmit, onBack }: UserDataFormProps) {
     phone: "",
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
+  const [successMsg, setSuccessMsg] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
+    setErrorMsg(null)
+    setSuccessMsg(null)
     try {
+      // Send to Brevo contacts API via our API route
+      const [firstName, ...rest] = formData.name.trim().split(" ")
+      const lastName = rest.join(" ")
+
+      const res = await fetch("/api/brevo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: formData.email,
+          firstName: firstName || formData.name,
+          lastName: lastName || "",
+        }),
+        keepalive: true,
+      })
+
+      const data = await res.json()
+      if (!res.ok || data?.ok === false) {
+        setErrorMsg(data?.error || "Failed to add to Brevo")
+        return
+      }
+      setSuccessMsg("Added to Brevo ✅")
+
       onSubmit(formData)
     } finally {
       setIsSubmitting(false)
@@ -139,6 +165,12 @@ export function UserDataForm({ onSubmit, onBack }: UserDataFormProps) {
             </form>
           </CardContent>
         </Card>
+        {errorMsg && (
+          <div className="mt-4 text-sm text-red-600 text-center">{errorMsg}</div>
+        )}
+        {successMsg && (
+          <div className="mt-4 text-sm text-green-600 text-center">{successMsg}</div>
+        )}
       </div>
     </div>
   )
